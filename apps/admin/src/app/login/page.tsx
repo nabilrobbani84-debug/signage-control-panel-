@@ -3,16 +3,23 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Radio, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { useLogin } from '@/hooks/useAuth';
+import { useLogin, useRegister } from '@/hooks/useAuth';
 import { Input } from '@/components/ui/Input';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { mutate: login, isPending, error } = useLogin();
+  const [mode, setMode] = useState<'login' | 'register'>('login');
+  
+  const { mutate: login, isPending: isLoginPending } = useLogin();
+  const { mutate: register, isPending: isRegisterPending } = useRegister();
+
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('admin@signage.id');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  const isPending = isLoginPending || isRegisterPending;
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -24,20 +31,37 @@ export default function LoginPage() {
     e.preventDefault();
     setErrorMessage('');
 
-    login(
-      { email, password },
-      {
-        onSuccess: () => {
-          router.replace('/');
-        },
-        onError: (err: unknown) => {
-          const message =
-            (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-            'Login failed. Please check your credentials.';
-          setErrorMessage(message);
-        },
-      }
-    );
+    if (mode === 'login') {
+      login(
+        { email, password },
+        {
+          onSuccess: () => {
+            router.replace('/');
+          },
+          onError: (err: unknown) => {
+            const message =
+              (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
+              'Login failed. Please check your credentials.';
+            setErrorMessage(message);
+          },
+        }
+      );
+    } else {
+      register(
+        { name, email, password },
+        {
+          onSuccess: () => {
+            router.replace('/');
+          },
+          onError: (err: unknown) => {
+            const message =
+              (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
+              'Registration failed. Please try again.';
+            setErrorMessage(message);
+          },
+        }
+      );
+    }
   };
 
   return (
@@ -55,7 +79,7 @@ export default function LoginPage() {
         {/* Card */}
         <div className="glass-card p-8">
           {/* Logo */}
-          <div className="mb-8 flex flex-col items-center gap-3">
+          <div className="mb-6 flex flex-col items-center gap-3">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 ring-1 ring-accent/30 shadow-glow">
               <Radio className="h-7 w-7 text-accent" />
             </div>
@@ -65,7 +89,51 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {/* Mode Switcher Tabs */}
+          <div className="mb-6 flex rounded-lg bg-white/[0.05] p-1 border border-white/10">
+            <button
+              type="button"
+              onClick={() => {
+                setMode('login');
+                setErrorMessage('');
+              }}
+              className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all ${
+                mode === 'login'
+                  ? 'bg-accent text-white shadow'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode('register');
+                setErrorMessage('');
+              }}
+              className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all ${
+                mode === 'register'
+                  ? 'bg-accent text-white shadow'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Register
+            </button>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
+            {mode === 'register' && (
+              <Input
+                id="register-name"
+                label="Full Name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Nama Lengkap"
+                required
+              />
+            )}
+
             <Input
               id="login-email"
               label="Email Address"
@@ -87,7 +155,7 @@ export default function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder="Enter password (min 6 characters)"
                   autoComplete="current-password"
                   required
                   className="w-full rounded-lg border border-white/10 bg-white/[0.05] px-3 py-2.5 pr-10 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all duration-200 focus:border-accent/50 focus:bg-white/[0.07] focus:ring-2 focus:ring-accent/20"
@@ -116,10 +184,10 @@ export default function LoginPage() {
               {isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Signing in...
+                  {mode === 'login' ? 'Signing in...' : 'Registering...'}
                 </>
               ) : (
-                'Sign In'
+                mode === 'login' ? 'Sign In' : 'Create Account'
               )}
             </button>
           </form>

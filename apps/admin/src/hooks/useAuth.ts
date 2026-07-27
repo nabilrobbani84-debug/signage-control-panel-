@@ -1,6 +1,24 @@
 import { useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
-import type { LoginRequestDto, LoginResponseDto } from '@signage/types';
+import type { LoginRequestDto, LoginResponseDto, RegisterRequestDto } from '@signage/types';
+
+export function useRegister() {
+  return useMutation({
+    mutationFn: async (credentials: RegisterRequestDto): Promise<LoginResponseDto> => {
+      const { data } = await apiClient.post<{ success: boolean; data: LoginResponseDto }>(
+        '/auth/register',
+        credentials
+      );
+      return data.data;
+    },
+    onSuccess: (data) => {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('signage_token', data.token);
+        localStorage.setItem('signage_user', JSON.stringify(data.user));
+      }
+    },
+  });
+}
 
 export function useLogin() {
   return useMutation({

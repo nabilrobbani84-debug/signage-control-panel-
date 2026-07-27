@@ -1,9 +1,15 @@
 import { Router } from 'express';
-import { login } from './auth.controller';
+import { login, register } from './auth.controller';
 import { validate } from '../../middleware/validate';
-import { loginSchema } from './auth.schema';
+import { loginSchema, registerSchema } from './auth.schema';
 
 const router = Router();
+
+/**
+ * POST /api/auth/register
+ * Register a new user and receive a JWT token.
+ */
+router.post('/register', validate(registerSchema), register);
 
 /**
  * POST /api/auth/login
