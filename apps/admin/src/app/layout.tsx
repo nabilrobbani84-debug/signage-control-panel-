@@ -4,6 +4,8 @@ import './globals.css';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { SocketProvider } from '@/providers/SocketProvider';
 
+import AppProviders from '@/components/AppProviders';
+
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -17,19 +19,11 @@ export const metadata: Metadata = {
   keywords: ['digital signage', 'control panel', 'display management', 'content management'],
 };
 
-import { ClientOnly } from '@/components/ClientOnly';
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" className="dark" suppressHydrationWarning>
       <body className={`${inter.variable} min-h-screen bg-[hsl(222,47%,6%)] font-sans text-slate-100`} suppressHydrationWarning>
-        <ClientOnly>
-          <QueryProvider>
-            <SocketProvider>
-              {children}
-            </SocketProvider>
-          </QueryProvider>
-        </ClientOnly>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );
