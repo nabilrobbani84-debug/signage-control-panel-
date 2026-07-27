@@ -42,9 +42,19 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       console.log('[Admin Socket] Disconnected from server');
     });
 
-    // When a device status changes, invalidate the devices query so the table refreshes instantly
+    // When a device status changes, update the local cache immediately for zero-latency UI reactivity
     socket.on(SOCKET_EVENTS.DEVICE_STATUS_CHANGE, (payload: DeviceStatusChangePayload) => {
       console.log(`[Admin Socket] Device status change: ${payload.deviceId} → ${payload.status}`);
+      
+      queryClient.setQueryData(['devices'], (oldData: unknown) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.map((device: { id: string; status: string; last_seen?: string }) =>
+          device.id === payload.deviceId
+            ? { ...device, status: payload.status, last_seen: payload.last_seen }
+            : device
+        );
+      });
+
       queryClient.invalidateQueries({ queryKey: ['devices'] });
     });
 

@@ -3,7 +3,7 @@ import { Server as HttpServer } from 'http';
 import { env } from '../config/env';
 import { SOCKET_EVENTS, CmdUpdateContentPayload } from '@signage/types';
 import { HeartbeatService } from './heartbeat.service';
-import { markDeviceOnline } from '../modules/devices/devices.service';
+import { markDeviceOnline, markDeviceOffline } from '../modules/devices/devices.service';
 
 /**
  * Singleton gateway that manages all Socket.io connections.
@@ -103,6 +103,23 @@ export class SocketGateway {
         if (deviceId) {
           this.deviceSocketMap.delete(deviceId);
           console.log(`[Socket/Device] Cleaned up mapping for device: ${deviceId}`);
+
+          try {
+            await markDeviceOffline(deviceId);
+
+            this.io.of('/admin').emit(SOCKET_EVENTS.DEVICE_DISCONNECTED, {
+              deviceId,
+              disconnectedAt: new Date().toISOString(),
+            });
+
+            this.io.of('/admin').emit(SOCKET_EVENTS.DEVICE_STATUS_CHANGE, {
+              deviceId,
+              status: 'OFFLINE',
+              last_seen: new Date().toISOString(),
+            });
+          } catch (err) {
+            console.warn(`[Socket/Device] Could not mark device offline ${deviceId}:`, err);
+          }
         }
       });
     });
