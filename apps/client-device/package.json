@@ -36,8 +36,11 @@
     "files": ["dist/**", "electron/**"],
     "win": {
       "target": "nsis",
-      "icon": "public/icon.ico"
+      "icon": "public/icon.ico",
+      "verifyUpdateCodeSignature": false
     },
+    "winCodeSign": false,
+    "mac": null,
     "linux": {
       "target": "AppImage"
     }

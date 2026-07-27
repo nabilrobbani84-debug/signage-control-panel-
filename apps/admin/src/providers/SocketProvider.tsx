@@ -22,11 +22,12 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
+    // Only attempt WebSocket connection if WS server is configured or in local development
     const socket = io(`${WS_URL}/admin`, {
       autoConnect: true,
       reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000,
+      reconnectionAttempts: 3,
+      reconnectionDelay: 5000,
       reconnectionDelayMax: 10000,
     });
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { SocketProvider } from '@/providers/SocketProvider';
+import { AuthGuard } from './AuthGuard';
 
 export default function AppProviders({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -17,9 +18,11 @@ export default function AppProviders({ children }: { children: React.ReactNode }
 
   return (
     <QueryProvider>
-      <SocketProvider>
-        {children}
-      </SocketProvider>
+      <AuthGuard>
+        <SocketProvider>
+          {children}
+        </SocketProvider>
+      </AuthGuard>
     </QueryProvider>
   );
 }
