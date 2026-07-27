@@ -67,6 +67,7 @@ export class SocketGateway {
 
         try {
           await markDeviceOnline(deviceId);
+          this.heartbeat.recordPing(deviceId);
 
           // Notify admin namespace about the connection
           this.io.of('/admin').emit(SOCKET_EVENTS.DEVICE_CONNECTED, {

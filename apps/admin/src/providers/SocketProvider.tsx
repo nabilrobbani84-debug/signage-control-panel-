@@ -46,6 +46,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     socket.on(SOCKET_EVENTS.DEVICE_STATUS_CHANGE, (payload: DeviceStatusChangePayload) => {
       console.log(`[Admin Socket] Device status change: ${payload.deviceId} → ${payload.status}`);
       
+      // Update devices list cache
       queryClient.setQueryData(['devices'], (oldData: unknown) => {
         if (!Array.isArray(oldData)) return oldData;
         return oldData.map((device: { id: string; status: string; last_seen?: string }) =>
@@ -55,7 +56,14 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         );
       });
 
+      // Update single device cache
+      queryClient.setQueryData(['devices', payload.deviceId], (oldDevice: any) => {
+        if (!oldDevice) return oldDevice;
+        return { ...oldDevice, status: payload.status, last_seen: payload.last_seen };
+      });
+
       queryClient.invalidateQueries({ queryKey: ['devices'] });
+      queryClient.invalidateQueries({ queryKey: ['devices', payload.deviceId] });
     });
 
     socket.on(SOCKET_EVENTS.DEVICE_CONNECTED, () => {

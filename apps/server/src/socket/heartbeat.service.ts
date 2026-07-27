@@ -62,10 +62,21 @@ export class HeartbeatService {
     for (const [deviceId, record] of this.pingRegistry.entries()) {
       const elapsed = now - record.lastPing;
       const isStale = elapsed > DEVICE_TIMEOUT_MS;
-      const isConnected = this.deviceSocketMap.has(deviceId);
 
-      if (isStale && !record.markedOffline && !isConnected) {
+      if (isStale && !record.markedOffline) {
         this.pingRegistry.set(deviceId, { ...record, markedOffline: true });
+        
+        // Force disconnect the stale socket
+        const socketId = this.deviceSocketMap.get(deviceId);
+        if (socketId) {
+          const socket = this.io.of('/device').sockets.get(socketId);
+          if (socket) {
+            console.log(`[Heartbeat] Disconnecting stale socket ${socketId} for device ${deviceId}`);
+            socket.disconnect(true);
+          }
+          this.deviceSocketMap.delete(deviceId);
+        }
+
         this.markOffline(deviceId).catch((err) => {
           console.error(`[Heartbeat] Failed to mark device ${deviceId} offline:`, err);
         });
