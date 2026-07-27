@@ -45,9 +45,18 @@ export function DeviceFormModal({ open, onClose, editDevice }: DeviceFormModalPr
       setErrors({});
     };
 
-    const onError = (err: unknown) => {
+    const onError = (err: any) => {
+      if (err?.response?.status === 401) {
+        setServerError('Sesi Anda telah berakhir atau belum login. Silakan login ulang.');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1500);
+        return;
+      }
       const msg =
-        (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
+        err?.response?.data?.error ??
+        err?.response?.data?.message ??
+        err?.message ??
         'An error occurred. Please try again.';
       setServerError(msg);
     };
