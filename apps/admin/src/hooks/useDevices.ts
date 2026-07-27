@@ -16,10 +16,12 @@ async function fetchDevice(id: string): Promise<DeviceDto> {
 }
 
 export function useDevices() {
+  const hasToken = typeof window !== 'undefined' ? !!localStorage.getItem('signage_token') : false;
   return useQuery({
     queryKey: DEVICES_KEY,
     queryFn: fetchDevices,
-    refetchInterval: 60_000,
+    refetchInterval: hasToken ? 60_000 : false,
+    enabled: hasToken,
   });
 }
 

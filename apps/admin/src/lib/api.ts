@@ -27,7 +27,9 @@ apiClient.interceptors.response.use(
       if (typeof window !== 'undefined') {
         localStorage.removeItem('signage_token');
         localStorage.removeItem('signage_user');
-        window.location.href = '/login';
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);

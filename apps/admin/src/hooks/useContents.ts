@@ -11,9 +11,11 @@ async function fetchContents(): Promise<ContentDto[]> {
 }
 
 export function useContents() {
+  const hasToken = typeof window !== 'undefined' ? !!localStorage.getItem('signage_token') : false;
   return useQuery({
     queryKey: CONTENTS_KEY,
     queryFn: fetchContents,
+    enabled: hasToken,
   });
 }
 
