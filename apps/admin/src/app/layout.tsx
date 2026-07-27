@@ -23,11 +23,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="id" className="dark" suppressHydrationWarning>
       <body className={`${inter.variable} min-h-screen bg-[hsl(222,47%,6%)] font-sans text-slate-100`} suppressHydrationWarning>
-        <QueryProvider>
-          <SocketProvider>
-            <ClientOnly>{children}</ClientOnly>
-          </SocketProvider>
-        </QueryProvider>
+        <ClientOnly>
+          <QueryProvider>
+            <SocketProvider>
+              {children}
+            </SocketProvider>
+          </QueryProvider>
+        </ClientOnly>
       </body>
     </html>
   );
