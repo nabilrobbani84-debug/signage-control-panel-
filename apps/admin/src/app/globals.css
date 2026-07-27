@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Custom Properties ─────────────────────────────── */
+:root {
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-jetbrains: 'JetBrains Mono', monospace;
+}
+
+/* ── Base Styles ────────────────────────────────────────── */
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    @apply antialiased;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: hsl(222, 47%, 6%);
+    color: hsl(214, 32%, 91%);
+    font-family: var(--font-inter);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(222, 47%, 24%);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(222, 47%, 32%);
+  }
+}
+
+/* ── Component Classes ──────────────────────────────────── */
+@layer components {
+  /* Glassmorphism card */
+  .glass-card {
+    @apply relative rounded-xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-xl;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  /* Sidebar navigation item */
+  .nav-item {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-200 hover:bg-white/[0.05] hover:text-slate-100;
+  }
+
+  .nav-item.active {
+    @apply bg-accent/10 text-accent;
+    box-shadow: inset 0 0 0 1px hsl(217, 91%, 60%, 0.2);
+  }
+
+  /* Status badge */
+  .badge-online {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-success-muted px-2.5 py-0.5 text-xs font-medium text-success;
+  }
+
+  .badge-offline {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-danger-muted px-2.5 py-0.5 text-xs font-medium text-danger;
+  }
+
+  /* Pulse dot for ONLINE status */
+  .pulse-dot {
+    @apply relative flex h-2 w-2;
+  }
+
+  .pulse-dot::before {
+    @apply absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75;
+    content: '';
+  }
+
+  .pulse-dot::after {
+    @apply relative inline-flex h-2 w-2 rounded-full bg-success;
+    content: '';
+  }
+
+  /* Input field */
+  .form-input {
+    @apply w-full rounded-lg border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-slate-100 placeholder-slate-500 outline-none ring-0 transition-all duration-200 focus:border-accent/50 focus:bg-white/[0.07] focus:ring-2 focus:ring-accent/20;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white shadow-glow transition-all duration-200 hover:bg-accent-hover hover:shadow-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-slate-300 transition-all duration-200 hover:border-white/20 hover:bg-white/[0.05] hover:text-slate-100 active:scale-[0.98];
+  }
+
+  /* Danger button */
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-danger/10 px-4 py-2 text-sm font-semibold text-danger transition-all duration-200 hover:bg-danger/20 active:scale-[0.98];
+  }
+
+  /* Stats card shimmer on hover */
+  .stats-card {
+    @apply glass-card cursor-default p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/20;
+  }
+
+  /* Table row */
+  .table-row-hover {
+    @apply transition-colors duration-150 hover:bg-white/[0.03];
+  }
+
+  /* Content type chip */
+  .chip-image { @apply rounded-md bg-purple-500/15 px-2 py-0.5 text-xs font-medium text-purple-300; }
+  .chip-video { @apply rounded-md bg-rose-500/15 px-2 py-0.5 text-xs font-medium text-rose-300; }
+  .chip-text  { @apply rounded-md bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-300; }
+  .chip-web   { @apply rounded-md bg-cyan-500/15 px-2 py-0.5 text-xs font-medium text-cyan-300; }
+}
+
+/* ── Utility Animations ──────────────────────────────────── */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}

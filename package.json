@@ -1,0 +1,27 @@
+{
+  "name": "signage-control-panel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Digital Signage Control Panel — PT MJ Solution Indonesia Technical Test",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "db:generate": "pnpm --filter @signage/database prisma generate",
+    "db:push": "pnpm --filter @signage/database prisma db push",
+    "db:migrate": "pnpm --filter @signage/database prisma migrate dev",
+    "db:seed": "pnpm --filter @signage/database prisma db seed",
+    "db:studio": "pnpm --filter @signage/database prisma studio"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.6.3",
+    "prettier": "^3.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.14.4"
+}
