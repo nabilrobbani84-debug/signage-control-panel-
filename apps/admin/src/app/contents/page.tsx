@@ -42,10 +42,10 @@ export default function ContentsPage() {
           subtitle={`${contents.length} items · ${Object.values(ContentType).map((t) => `${contents.filter((c) => c.tipe === t).length} ${t}`).join(' · ')}`}
         />
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6">
           {/* Toolbar */}
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                 <input
@@ -53,7 +53,7 @@ export default function ContentsPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search content..."
-                  className="form-input w-56 pl-9"
+                  className="form-input w-full sm:w-56 pl-9"
                 />
               </div>
 
@@ -92,7 +92,7 @@ export default function ContentsPage() {
 
               <button
                 onClick={() => { setEditTarget(null); setShowFormModal(true); }}
-                className="btn-primary"
+                className="btn-primary flex-1 sm:flex-none justify-center"
               >
                 <Plus className="h-4 w-4" />
                 Add Content
@@ -143,7 +143,7 @@ export default function ContentsPage() {
 
           {/* List View */}
           {viewMode === 'list' && (
-            <div className="glass-card overflow-hidden">
+            <div className="glass-card overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-white/[0.05]">

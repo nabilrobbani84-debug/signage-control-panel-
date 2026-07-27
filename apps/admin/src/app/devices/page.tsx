@@ -64,10 +64,10 @@ export default function DevicesPage() {
           subtitle={`${devices.length} registered · ${onlineCount} online`}
         />
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6">
           {/* Toolbar */}
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               {/* Search */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
@@ -76,7 +76,7 @@ export default function DevicesPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search devices..."
-                  className="form-input w-64 pl-9"
+                  className="form-input w-full sm:w-64 pl-9"
                 />
               </div>
 
@@ -96,14 +96,14 @@ export default function DevicesPage() {
               <button
                 onClick={() => refetch()}
                 disabled={isFetching}
-                className="btn-ghost"
+                className="btn-ghost flex-1 sm:flex-none justify-center"
               >
                 <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
                 Refresh
               </button>
               <button
                 onClick={() => { setEditTarget(null); setShowFormModal(true); }}
-                className="btn-primary"
+                className="btn-primary flex-1 sm:flex-none justify-center"
               >
                 <Plus className="h-4 w-4" />
                 Add Device
@@ -112,7 +112,7 @@ export default function DevicesPage() {
           </div>
 
           {/* Table */}
-          <div className="glass-card overflow-hidden">
+          <div className="glass-card overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/[0.05] text-left">

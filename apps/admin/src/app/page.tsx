@@ -29,7 +29,7 @@ export default function DashboardPage() {
           subtitle="Real-time signage network status"
         />
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6">
           {/* Ambient gradient background */}
           <div
             className="pointer-events-none fixed inset-0 opacity-30"
