@@ -29,7 +29,7 @@ export class SocketGateway {
   initialize(httpServer: HttpServer): void {
     this.io = new SocketIOServer(httpServer, {
       cors: {
-        origin: env.CORS_ORIGIN.split(','),
+        origin: true,
         methods: ['GET', 'POST'],
         credentials: true,
       },

@@ -117,14 +117,14 @@ export async function removeContentFromPlaylist(deviceId: string, contentId: str
 }
 
 export async function markDeviceOffline(deviceId: string) {
-  return prisma.device.update({
+  return prisma.device.updateMany({
     where: { id: deviceId },
     data: { status: 'OFFLINE', last_seen: new Date() },
   });
 }
 
 export async function markDeviceOnline(deviceId: string) {
-  return prisma.device.update({
+  return prisma.device.updateMany({
     where: { id: deviceId },
     data: { status: 'ONLINE', last_seen: new Date() },
   });
