@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login, register } from './auth.controller';
+import { login, register, logout } from './auth.controller';
 import { validate } from '../../middleware/validate';
 import { loginSchema, registerSchema } from './auth.schema';
 
@@ -16,5 +16,10 @@ router.post('/register', validate(registerSchema), register);
  * Authenticate an admin user and receive a JWT token.
  */
 router.post('/login', validate(loginSchema), login);
+/**
+ * POST /api/auth/logout
+ * Inform backend of logout (optional for stateless JWT, but good for client clearing).
+ */
+router.post('/logout', logout);
 
 export { router as authRouter };

@@ -14,6 +14,8 @@ import { cn } from '@/lib/cn';
 import { useLogout } from '@/hooks/useAuth';
 import { useSocketContext } from '@/providers/SocketProvider';
 
+import Image from 'next/image';
+
 const navItems = [
   { label: 'Overview', href: '/', icon: LayoutDashboard },
   { label: 'Devices', href: '/devices', icon: Monitor },
@@ -28,24 +30,22 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex h-screen w-64 flex-col border-r border-white/[0.05] bg-[hsl(222,47%,6%)] shrink-0">
-        {/* Logo */}
-        <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/[0.05] px-5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/15 ring-1 ring-accent/20">
-            <Radio className="h-4 w-4 text-accent" />
+      <aside className="hidden md:flex h-screen w-64 flex-col border-r border-surface-border bg-background shrink-0">
+        <div className="flex h-16 shrink-0 items-center gap-3 border-b border-surface-border px-6">
+          <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-surface">
+            <Image src="/logo.png" alt="Signage Logo" width={32} height={32} className="object-cover" />
           </div>
           <div>
-            <p className="text-sm font-bold text-slate-100 leading-none">Signage CP</p>
-            <p className="mt-0.5 text-[10px] font-medium text-slate-500 leading-none">MJ Solution ID</p>
+            <p className="text-sm font-semibold text-foreground tracking-tight leading-none">Signage</p>
+            <p className="mt-1 text-[11px] font-medium text-neutral-500 leading-none">Control Panel</p>
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-3">
-          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-600">
-            Navigation
+        <nav className="flex-1 overflow-y-auto p-4">
+          <p className="mb-3 px-2 text-[10px] font-medium uppercase tracking-wider text-neutral-500">
+            Menu
           </p>
-          <ul className="space-y-0.5">
+          <ul className="space-y-1">
             {navItems.map(({ label, href, icon: Icon }) => {
               const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
               return (
@@ -53,17 +53,14 @@ export function Sidebar() {
                   <Link
                     href={href}
                     className={cn(
-                      'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                      'group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all',
                       isActive
-                        ? 'bg-accent/10 text-accent ring-1 ring-accent/20'
-                        : 'text-slate-400 hover:bg-white/[0.05] hover:text-slate-200'
+                        ? 'bg-surface text-foreground'
+                        : 'text-neutral-400 hover:bg-surface-hover hover:text-foreground'
                     )}
                   >
                     <Icon className="h-4 w-4 shrink-0" />
                     {label}
-                    {isActive && (
-                      <ChevronRight className="ml-auto h-3.5 w-3.5 opacity-50" />
-                    )}
                   </Link>
                 </li>
               );
@@ -71,24 +68,22 @@ export function Sidebar() {
           </ul>
         </nav>
 
-        {/* Footer */}
-        <div className="shrink-0 border-t border-white/[0.05] p-3 space-y-2">
-          {/* WS Connection Status */}
-          <div className="flex items-center gap-2 rounded-lg bg-white/[0.03] px-3 py-2">
+        <div className="shrink-0 border-t border-surface-border p-4 space-y-3">
+          <div className="flex items-center gap-2 rounded-md bg-surface border border-surface-border px-3 py-2">
             <span
               className={cn(
-                'h-1.5 w-1.5 rounded-full',
-                isConnected ? 'bg-success animate-pulse' : 'bg-slate-600'
+                'h-2 w-2 rounded-full',
+                isConnected ? 'bg-success animate-pulse' : 'bg-neutral-600'
               )}
             />
-            <span className="text-xs text-slate-500">
-              {isConnected ? 'Live updates active' : 'Connecting...'}
+            <span className="text-xs font-medium text-neutral-400">
+              {isConnected ? 'System online' : 'Connecting...'}
             </span>
           </div>
 
           <button
             onClick={logout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-200 hover:bg-danger/10 hover:text-danger"
+            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-neutral-400 transition-all hover:bg-danger/10 hover:text-danger"
           >
             <LogOut className="h-4 w-4 shrink-0" />
             Sign Out
@@ -97,7 +92,7 @@ export function Sidebar() {
       </aside>
 
       {/* Mobile Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-white/10 bg-[hsl(222,47%,6%)]/95 px-2 py-2 backdrop-blur-lg">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-surface-border bg-background/95 px-2 py-2 backdrop-blur-lg">
         {navItems.map(({ label, href, icon: Icon }) => {
           const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
           return (
@@ -105,8 +100,8 @@ export function Sidebar() {
               key={href}
               href={href}
               className={cn(
-                'flex flex-col items-center gap-1 rounded-lg px-3 py-1.5 text-[11px] font-medium transition-colors',
-                isActive ? 'text-accent' : 'text-slate-400 hover:text-slate-200'
+                'flex flex-col items-center gap-1 rounded-md px-3 py-1.5 text-[11px] font-medium transition-colors',
+                isActive ? 'text-foreground' : 'text-neutral-500 hover:text-foreground'
               )}
             >
               <Icon className="h-5 w-5" />
@@ -116,7 +111,7 @@ export function Sidebar() {
         })}
         <button
           onClick={logout}
-          className="flex flex-col items-center gap-1 rounded-lg px-3 py-1.5 text-[11px] font-medium text-slate-400 hover:text-danger"
+          className="flex flex-col items-center gap-1 rounded-md px-3 py-1.5 text-[11px] font-medium text-neutral-500 hover:text-danger"
         >
           <LogOut className="h-5 w-5" />
           <span>Sign Out</span>

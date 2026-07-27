@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Radio, Eye, EyeOff, Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useLogin, useRegister } from '@/hooks/useAuth';
-import { Input } from '@/components/ui/Input';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,7 +21,6 @@ export default function LoginPage() {
 
   const isPending = isLoginPending || isRegisterPending;
 
-  // Redirect if already authenticated
   useEffect(() => {
     const token = localStorage.getItem('signage_token');
     if (token) router.replace('/');
@@ -35,9 +34,7 @@ export default function LoginPage() {
       login(
         { email, password },
         {
-          onSuccess: () => {
-            router.replace('/');
-          },
+          onSuccess: () => router.replace('/'),
           onError: (err: unknown) => {
             const message =
               (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
@@ -50,9 +47,7 @@ export default function LoginPage() {
       register(
         { name, email, password },
         {
-          onSuccess: () => {
-            router.replace('/');
-          },
+          onSuccess: () => router.replace('/'),
           onError: (err: unknown) => {
             const message =
               (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
@@ -65,136 +60,117 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[hsl(222,47%,6%)] p-4">
-      {/* Ambient glow */}
-      <div
-        className="pointer-events-none fixed inset-0 opacity-40"
-        style={{
-          background:
-            'radial-gradient(ellipse at 30% 30%, hsl(217,91%,20%) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, hsl(189,100%,10%) 0%, transparent 50%)',
-        }}
-      />
-
-      <div className="relative w-full max-w-sm animate-fade-in">
-        {/* Card */}
-        <div className="glass-card p-8">
-          {/* Logo */}
-          <div className="mb-6 flex flex-col items-center gap-3">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 ring-1 ring-accent/30 shadow-glow">
-              <Radio className="h-7 w-7 text-accent" />
-            </div>
-            <div className="text-center">
-              <h1 className="text-xl font-bold text-slate-100">Signage Control Panel</h1>
-              <p className="mt-0.5 text-sm text-slate-500">PT MJ Solution Indonesia</p>
-            </div>
+    <div className="flex min-h-screen items-center justify-center bg-background p-4 sm:p-8">
+      <div className="w-full max-w-[400px] animate-fade-in space-y-8">
+        <div className="flex flex-col items-center space-y-4 text-center">
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-surface border border-surface-border">
+            <Image src="/logo.png" alt="Signage Logo" width={48} height={48} className="object-cover" />
           </div>
-
-          {/* Mode Switcher Tabs */}
-          <div className="mb-6 flex rounded-lg bg-white/[0.05] p-1 border border-white/10">
-            <button
-              type="button"
-              onClick={() => {
-                setMode('login');
-                setErrorMessage('');
-              }}
-              className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all ${
-                mode === 'login'
-                  ? 'bg-accent text-white shadow'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMode('register');
-                setErrorMessage('');
-              }}
-              className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all ${
-                mode === 'register'
-                  ? 'bg-accent text-white shadow'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Register
-            </button>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              {mode === 'login' ? 'Welcome back' : 'Create an account'}
+            </h1>
+            <p className="mt-2 text-sm text-neutral-400">
+              Signage Control Panel · PT MJ Solution
+            </p>
           </div>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === 'register' && (
-              <Input
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {mode === 'register' && (
+            <div className="space-y-2">
+              <label htmlFor="register-name" className="text-sm font-medium text-foreground">
+                Full Name
+              </label>
+              <input
                 id="register-name"
-                label="Full Name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Nama Lengkap"
+                placeholder="John Doe"
                 required
+                className="form-input"
               />
-            )}
+            </div>
+          )}
 
-            <Input
+          <div className="space-y-2">
+            <label htmlFor="login-email" className="text-sm font-medium text-foreground">
+              Email
+            </label>
+            <input
               id="login-email"
-              label="Email Address"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@signage.id"
+              placeholder="name@example.com"
               autoComplete="email"
               required
+              className="form-input"
             />
+          </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="login-password" className="text-sm font-medium text-slate-300">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label htmlFor="login-password" className="text-sm font-medium text-foreground">
                 Password
               </label>
-              <div className="relative">
-                <input
-                  id="login-password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password (min 6 characters)"
-                  autoComplete="current-password"
-                  required
-                  className="w-full rounded-lg border border-white/10 bg-white/[0.05] px-3 py-2.5 pr-10 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all duration-200 focus:border-accent/50 focus:bg-white/[0.07] focus:ring-2 focus:ring-accent/20"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
             </div>
+            <div className="relative">
+              <input
+                id="login-password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                required
+                className="form-input pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-foreground transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
 
-            {errorMessage && (
-              <div className="rounded-lg bg-danger/10 px-3 py-2.5 text-sm text-danger ring-1 ring-danger/20">
-                {errorMessage}
-              </div>
+          {errorMessage && (
+            <div className="rounded-md bg-danger/10 p-3 text-sm text-danger border border-danger/20">
+              {errorMessage}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={isPending}
+            className="btn-primary w-full h-10"
+          >
+            {isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : mode === 'login' ? (
+              'Sign In'
+            ) : (
+              'Register'
             )}
+          </button>
+        </form>
 
-            <button
-              type="submit"
-              disabled={isPending}
-              className="btn-primary mt-2 w-full"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  {mode === 'login' ? 'Signing in...' : 'Registering...'}
-                </>
-              ) : (
-                mode === 'login' ? 'Sign In' : 'Create Account'
-              )}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-xs text-slate-600">
-            Signage Control Panel v1.0 · PT MJ Solution Indonesia
-          </p>
+        <div className="text-center text-sm text-neutral-500">
+          {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+          <button
+            type="button"
+            onClick={() => {
+              setMode(mode === 'login' ? 'register' : 'login');
+              setErrorMessage('');
+            }}
+            className="font-medium text-foreground hover:underline transition-all"
+          >
+            {mode === 'login' ? 'Sign up' : 'Sign in'}
+          </button>
         </div>
       </div>
     </div>

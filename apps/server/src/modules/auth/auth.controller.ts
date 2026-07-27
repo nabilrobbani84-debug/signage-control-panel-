@@ -19,3 +19,12 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
     next(err);
   }
 }
+
+export async function logout(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    // For stateless JWT, we just return success. Client will remove the token.
+    res.status(200).json({ success: true, message: 'Logged out successfully' });
+  } catch (err) {
+    next(err);
+  }
+}
