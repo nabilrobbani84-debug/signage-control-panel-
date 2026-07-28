@@ -19,8 +19,12 @@ export function MediaRenderer({ item, onEnded }: MediaRendererProps) {
     // Clear any existing timer
     if (timerRef.current) clearTimeout(timerRef.current);
 
-    // For non-video types, auto-advance after durasi seconds
-    if (item.tipe !== ContentType.VIDEO) {
+    // Helper to check if payload is a YouTube video URL
+    const isYoutube = item.tipe === ContentType.VIDEO && 
+      (item.payload.includes('youtube.com') || item.payload.includes('youtu.be'));
+
+    // For non-video types OR YouTube iframes, auto-advance after durasi seconds
+    if (item.tipe !== ContentType.VIDEO || isYoutube) {
       timerRef.current = setTimeout(onEnded, item.durasi * 1000);
     }
 
@@ -29,11 +33,35 @@ export function MediaRenderer({ item, onEnded }: MediaRendererProps) {
     };
   }, [item, onEnded]);
 
+  // Helper to extract direct image URL from Google Images search page redirects
+  const getCleanImageUrl = (url: string): string => {
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.hostname.includes('google') && urlObj.pathname.includes('imgres')) {
+        const imgUrl = urlObj.searchParams.get('imgurl');
+        if (imgUrl) return decodeURIComponent(imgUrl);
+      }
+    } catch (e) {
+      // Ignore
+    }
+    return url;
+  };
+
+  // Helper to get YouTube Embed URL from any watch or sharing link
+  const getYoutubeEmbedUrl = (url: string): string | null => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+      return `https://www.youtube.com/embed/${match[2]}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1`;
+    }
+    return null;
+  };
+
   switch (item.tipe) {
     case ContentType.IMAGE:
       return (
         <img
-          src={item.payload}
+          src={getCleanImageUrl(item.payload)}
           alt={item.judul}
           className="h-full w-full object-cover"
           onError={(e) => {
@@ -44,6 +72,17 @@ export function MediaRenderer({ item, onEnded }: MediaRendererProps) {
       );
 
     case ContentType.VIDEO:
+      const youtubeUrl = getYoutubeEmbedUrl(item.payload);
+      if (youtubeUrl) {
+        return (
+          <iframe
+            src={youtubeUrl}
+            className="h-full w-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            title={item.judul}
+          />
+        );
+      }
       return (
         <video
           ref={videoRef}
