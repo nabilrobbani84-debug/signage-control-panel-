@@ -73,6 +73,42 @@ export function ConnectionOverlay() {
     );
   }
 
+  const [isPairing, setIsPairing] = useState(false);
+  const [devicesList, setDevicesList] = useState<any[]>([]);
+  const [loadingDevices, setLoadingDevices] = useState(false);
+  const [selectedPairId, setSelectedPairId] = useState('');
+  const [manualIdInput, setManualIdInput] = useState('');
+  const [showManualInput, setShowManualInput] = useState(false);
+
+  const fetchDevicesForPairing = async () => {
+    setLoadingDevices(true);
+    try {
+      const res = await fetch(`${SERVER_URL}/api/devices/public/list`);
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        setDevicesList(json.data);
+        if (json.data.length > 0) {
+          setSelectedPairId(json.data[0].id);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load devices list', err);
+      setShowManualInput(true);
+    } finally {
+      setLoadingDevices(false);
+    }
+  };
+
+  const handleConfirmPairing = () => {
+    const finalId = showManualInput ? manualIdInput.trim() : selectedPairId;
+    if (!finalId) {
+      alert('Please enter or select a valid Device ID.');
+      return;
+    }
+    useDeviceStore.getState().setDeviceId(finalId);
+    window.location.reload();
+  };
+
   return (
     <div
       style={{
@@ -80,20 +116,21 @@ export function ConnectionOverlay() {
         top: 16,
         right: 16,
         zIndex: 100,
-        background: 'rgba(0,0,0,0.7)',
-        backdropFilter: 'blur(12px)',
+        background: 'rgba(0,0,0,0.85)',
+        backdropFilter: 'blur(16px)',
         borderRadius: 12,
-        border: '1px solid rgba(255,255,255,0.08)',
-        padding: '10px 14px',
-        minWidth: 220,
+        border: '1px solid rgba(255,255,255,0.12)',
+        padding: '12px 16px',
+        minWidth: 260,
         fontFamily: 'monospace',
         fontSize: 11,
-        color: 'rgba(255,255,255,0.7)',
+        color: 'rgba(255,255,255,0.85)',
         lineHeight: 1.8,
+        boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyBetween: 'space-between', marginBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: 4 }}>
         <span style={{ fontWeight: 700, fontSize: 10, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
           Signage Client
         </span>
@@ -107,6 +144,7 @@ export function ConnectionOverlay() {
             fontSize: 14,
             lineHeight: 1,
             padding: 0,
+            marginLeft: 'auto',
           }}
           title="Hide (F1)"
         >
@@ -114,68 +152,144 @@ export function ConnectionOverlay() {
         </button>
       </div>
 
-      {/* Device ID */}
-      <div style={{ marginBottom: 6 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-          <div>
-            <span style={{ color: 'rgba(255,255,255,0.35)' }}>ID: </span>
-            <span style={{ color: '#60a5fa' }} title={deviceId}>{deviceId.slice(0, 12)}...</span>
+      {isPairing ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ fontWeight: 'bold', fontSize: 10, color: '#60a5fa' }}>PAIR WITH DEVICE:</div>
+          
+          {loadingDevices ? (
+            <div style={{ color: 'rgba(255,255,255,0.4)' }}>Loading devices...</div>
+          ) : showManualInput ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <input
+                type="text"
+                placeholder="Enter Device UUID"
+                value={manualIdInput}
+                onChange={(e) => setManualIdInput(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: 'rgba(0,0,0,0.5)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'white',
+                  borderRadius: 4,
+                  padding: '4px 6px',
+                  fontSize: 10,
+                  outline: 'none',
+                }}
+              />
+              <button
+                onClick={() => setShowManualInput(false)}
+                style={{ background: 'none', border: 'none', color: '#60a5fa', fontSize: 9, cursor: 'pointer', textAlign: 'left', padding: 0 }}
+              >
+                ← Back to dropdown
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {devicesList.length === 0 ? (
+                <div style={{ color: '#ef4444', fontSize: 10 }}>No devices registered.</div>
+              ) : (
+                <select
+                  value={selectedPairId}
+                  onChange={(e) => setSelectedPairId(e.target.value)}
+                  style={{
+                    width: '100%',
+                    background: 'rgba(0,0,0,0.8)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    color: 'white',
+                    borderRadius: 4,
+                    padding: '4px 6px',
+                    fontSize: 10,
+                    outline: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {devicesList.map((d) => (
+                    <option key={d.id} value={d.id} style={{ background: '#111', color: 'white' }}>
+                      {d.nama} ({d.status === 'ONLINE' ? '🟢' : '🔴'})
+                    </option>
+                  ))}
+                </select>
+              )}
+              <button
+                onClick={() => setShowManualInput(true)}
+                style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 9, cursor: 'pointer', textAlign: 'left', padding: 0 }}
+              >
+                Or enter manual ID...
+              </button>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+            <button
+              onClick={handleConfirmPairing}
+              style={{
+                flex: 1,
+                background: '#22c55e',
+                color: 'white',
+                border: 'none',
+                padding: '4px 8px',
+                borderRadius: 4,
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: 10,
+              }}
+            >
+              Connect
+            </button>
+            <button
+              onClick={() => {
+                setIsPairing(false);
+                setShowManualInput(false);
+              }}
+              style={{
+                flex: 1,
+                background: 'rgba(255,255,255,0.1)',
+                color: 'white',
+                border: 'none',
+                padding: '4px 8px',
+                borderRadius: 4,
+                cursor: 'pointer',
+                fontSize: 10,
+              }}
+            >
+              Cancel
+            </button>
           </div>
-          <button
-            onClick={async () => {
-              try {
-                const res = await fetch(`${SERVER_URL}/api/devices/public/list`);
-                const json = await res.json();
-                if (json.success && Array.isArray(json.data)) {
-                  // Filter out already online devices to avoid pairing conflicts
-                  const available = json.data;
-                  if (available.length === 0) {
-                    alert('No devices registered. Please add a device in Admin Dashboard first.');
-                    return;
-                  }
-                  
-                  const options = available.map(d => `${d.nama} (${d.status}) [ID: ${d.id}]`).join('\n');
-                  const promptMsg = `Choose a Device to pair with this screen:\n\n` + 
-                    available.map((d, i) => `${i + 1}. ${d.nama} (${d.status})`).join('\n') + 
-                    `\n\nEnter the number of the device you want to pair (or cancel):`;
-                  
-                  const choice = window.prompt(promptMsg);
-                  if (choice !== null) {
-                    const idx = parseInt(choice.trim(), 10) - 1;
-                    if (idx >= 0 && idx < available.length) {
-                      const targetDevice = available[idx];
-                      useDeviceStore.getState().setDeviceId(targetDevice.id);
-                      window.location.reload();
-                    } else {
-                      alert('Invalid selection.');
-                    }
-                  }
-                } else {
-                  throw new Error('Failed to retrieve list');
-                }
-              } catch (err) {
-                console.error(err);
-                const manualId = window.prompt('Server list unavailable. Enter Device ID manually:', deviceId);
-                if (manualId && manualId.trim() !== '') {
-                  useDeviceStore.getState().setDeviceId(manualId.trim());
-                  window.location.reload();
-                }
-              }
-            }}
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: 'none',
-              color: 'white',
-              cursor: 'pointer',
-              fontSize: 9,
-              padding: '2px 6px',
-              borderRadius: 4,
-            }}
-          >
-            Pair Device
-          </button>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Device ID */}
+          <div style={{ marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+              <div>
+                <span style={{ color: 'rgba(255,255,255,0.35)' }}>ID: </span>
+                <span style={{ color: '#60a5fa' }} title={deviceId}>{deviceId.slice(0, 12)}...</span>
+              </div>
+              <button
+                onClick={() => {
+                  setIsPairing(true);
+                  fetchDevicesForPairing();
+                }}
+                style={{
+                  background: 'rgba(255,255,255,0.12)',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: 9,
+                  padding: '2px 8px',
+                  borderRadius: 4,
+                  fontWeight: 'bold',
+                  transition: 'background 0.2s',
+                }}
+                onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
+                onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
+              >
+                Pair Device
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Connection status */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
