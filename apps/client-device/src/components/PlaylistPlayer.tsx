@@ -11,10 +11,8 @@ export function PlaylistPlayer() {
   const [visible, setVisible] = useState(true);
   const [displayIndex, setDisplayIndex] = useState(currentIndex);
 
-  // When the store index changes (e.g., from a push command), smoothly transition
+  // When the store index changes (via timer, end of video, or push), smoothly transition
   useEffect(() => {
-    if (currentIndex === displayIndex) return;
-
     setVisible(false);
     const timeout = setTimeout(() => {
       setDisplayIndex(currentIndex);
@@ -22,20 +20,11 @@ export function PlaylistPlayer() {
     }, 400);
 
     return () => clearTimeout(timeout);
-  }, [currentIndex, displayIndex]);
+  }, [currentIndex]);
 
   const handleEnded = useCallback(() => {
-    setVisible(false);
-    setTimeout(() => {
-      nextItem();
-      setVisible(true);
-    }, 400);
+    nextItem();
   }, [nextItem]);
-
-  // Also keep displayIndex in sync after nextItem
-  useEffect(() => {
-    setDisplayIndex(currentIndex);
-  }, [currentIndex]);
 
   if (playlist.length === 0) {
     return (
