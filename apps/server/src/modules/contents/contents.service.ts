@@ -40,14 +40,8 @@ export async function updateContent(id: string, input: UpdateContentInput) {
 export async function deleteContent(id: string) {
   await getContentById(id);
 
-  // Check if content is used in any playlist
-  const usageCount = await prisma.playlist.count({ where: { content_id: id } });
-  if (usageCount > 0) {
-    throw createError(
-      `Cannot delete content that is assigned to ${usageCount} device playlist(s). Remove it from playlists first.`,
-      409
-    );
-  }
+  // Remove content from all device playlists first
+  await prisma.playlist.deleteMany({ where: { content_id: id } });
 
   await prisma.content.delete({ where: { id } });
   console.log(`[Contents] Deleted content: ${id}`);

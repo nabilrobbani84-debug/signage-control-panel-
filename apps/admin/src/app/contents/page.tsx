@@ -28,8 +28,12 @@ export default function ContentsPage() {
   });
 
   const handleDelete = (content: ContentDto) => {
-    if (!confirm(`Delete "${content.judul}"?`)) return;
-    deleteContent.mutate(content.id);
+    if (!confirm(`Delete "${content.judul}"? This action cannot be undone.`)) return;
+    deleteContent.mutate(content.id, {
+      onError: (err: any) => {
+        alert(err.response?.data?.error || 'Failed to delete content');
+      },
+    });
   };
 
   return (
@@ -111,18 +115,20 @@ export default function ContentsPage() {
                     <div key={content.id} className="glass-card group p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/10">
                       <div className="mb-3 flex items-start justify-between gap-2">
                         <ContentTypeBadge type={content.tipe} />
-                        <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                        <div className="flex gap-1 items-center">
                           <button
                             onClick={() => { setEditTarget(content); setShowFormModal(true); }}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-slate-200"
+                            title="Edit Content"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-slate-200 transition-colors"
                           >
-                            <Pencil className="h-3 w-3" />
+                            <Pencil className="h-3.5 w-3.5" />
                           </button>
                           <button
                             onClick={() => handleDelete(content)}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-danger/15 hover:text-danger"
+                            title="Delete Content"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-danger/15 hover:text-danger transition-colors"
                           >
-                            <Trash2 className="h-3 w-3" />
+                            <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       </div>
