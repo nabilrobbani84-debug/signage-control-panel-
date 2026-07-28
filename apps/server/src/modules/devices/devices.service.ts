@@ -50,9 +50,14 @@ export async function createDevice(input: CreateDeviceInput) {
 export async function updateDevice(id: string, input: UpdateDeviceInput) {
   await getDeviceById(id); // throws 404 if not found
 
+  const updateData: any = { ...input };
+  if (input.status === DeviceStatus.ONLINE) {
+    updateData.last_seen = new Date();
+  }
+
   return prisma.device.update({
     where: { id },
-    data: input,
+    data: updateData,
   });
 }
 

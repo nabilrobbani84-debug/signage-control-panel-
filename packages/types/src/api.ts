@@ -72,6 +72,7 @@ export interface CreateDeviceDto {
 export interface UpdateDeviceDto {
   nama?: string;
   lokasi?: string;
+  status?: DeviceStatus;
 }
 
 // ─────────────────────────────────────────────

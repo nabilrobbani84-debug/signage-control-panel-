@@ -5,6 +5,7 @@ import { Loader2, X, Copy, Check } from 'lucide-react';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { useCreateDevice, useUpdateDevice } from '@/hooks/useDevices';
+import { DeviceStatus } from '@signage/types';
 import type { DeviceDto } from '@signage/types';
 
 interface DeviceFormModalProps {
@@ -20,6 +21,7 @@ export function DeviceFormModal({ open, onClose, editDevice }: DeviceFormModalPr
 
   const [nama, setNama] = useState(editDevice?.nama ?? '');
   const [lokasi, setLokasi] = useState(editDevice?.lokasi ?? '');
+  const [status, setStatus] = useState<DeviceStatus>(editDevice?.status ?? DeviceStatus.OFFLINE);
   const [errors, setErrors] = useState<{ nama?: string; lokasi?: string }>({});
   const [serverError, setServerError] = useState('');
   const [copied, setCopied] = useState(false);
@@ -28,9 +30,11 @@ export function DeviceFormModal({ open, onClose, editDevice }: DeviceFormModalPr
     if (editDevice) {
       setNama(editDevice.nama);
       setLokasi(editDevice.lokasi);
+      setStatus(editDevice.status ?? DeviceStatus.OFFLINE);
     } else {
       setNama('');
       setLokasi('');
+      setStatus(DeviceStatus.OFFLINE);
     }
   }, [editDevice]);
 
@@ -73,7 +77,7 @@ export function DeviceFormModal({ open, onClose, editDevice }: DeviceFormModalPr
     };
 
     if (isEdit && editDevice) {
-      updateDevice.mutate({ id: editDevice.id, nama, lokasi }, { onSuccess, onError });
+      updateDevice.mutate({ id: editDevice.id, nama, lokasi, status }, { onSuccess, onError });
     } else {
       createDevice.mutate({ nama, lokasi }, { onSuccess, onError });
     }
@@ -93,7 +97,7 @@ export function DeviceFormModal({ open, onClose, editDevice }: DeviceFormModalPr
       title={isEdit ? 'Edit Device' : 'Register New Device'}
       description={
         isEdit
-          ? 'Update the device name and location.'
+          ? 'Update the device name, location, or status.'
           : 'Add a new display device to the network.'
       }
     >
@@ -147,6 +151,23 @@ export function DeviceFormModal({ open, onClose, editDevice }: DeviceFormModalPr
           placeholder="e.g. Lantai 1 - Lobby"
           error={errors.lokasi}
         />
+
+        {isEdit && (
+          <div className="space-y-1.5">
+            <label htmlFor="device-status" className="block text-xs font-semibold text-slate-300">
+              Device Status
+            </label>
+            <select
+              id="device-status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value as DeviceStatus)}
+              className="form-input w-full bg-[hsl(222,47%,9%)] text-slate-200 border-white/10"
+            >
+              <option value={DeviceStatus.OFFLINE}>🔴 Offline</option>
+              <option value={DeviceStatus.ONLINE}>🟢 Online</option>
+            </select>
+          </div>
+        )}
 
         {serverError && (
           <div className="rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger ring-1 ring-danger/20">

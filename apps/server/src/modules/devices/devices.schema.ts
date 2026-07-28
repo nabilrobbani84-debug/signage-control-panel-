@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { DeviceStatus } from '@signage/types';
+
 export const createDeviceSchema = z.object({
   nama: z.string().min(1, 'Device name is required').max(100),
   lokasi: z.string().min(1, 'Location is required').max(200),
@@ -8,6 +10,7 @@ export const createDeviceSchema = z.object({
 export const updateDeviceSchema = z.object({
   nama: z.string().min(1).max(100).optional(),
   lokasi: z.string().min(1).max(200).optional(),
+  status: z.nativeEnum(DeviceStatus).optional(),
 });
 
 export const attachContentSchema = z.object({
