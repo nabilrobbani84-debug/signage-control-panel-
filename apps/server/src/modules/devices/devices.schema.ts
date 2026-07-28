@@ -14,13 +14,13 @@ export const updateDeviceSchema = z.object({
 });
 
 export const attachContentSchema = z.object({
-  content_id: z.string().uuid('Must be a valid content UUID'),
-  urutan: z.number().int().min(1).default(1),
-  durasi: z.number().int().min(5).max(3600).default(30),
+  content_id: z.string().min(1, 'Content ID is required'),
+  urutan: z.coerce.number().int().min(1).default(1),
+  durasi: z.coerce.number().int().min(1).max(86400).default(30),
 });
 
 export const pushContentSchema = z.object({
-  content_id: z.string().uuid('Must be a valid content UUID'),
+  content_id: z.string().min(1, 'Content ID is required'),
 });
 
 export type CreateDeviceInput = z.infer<typeof createDeviceSchema>;

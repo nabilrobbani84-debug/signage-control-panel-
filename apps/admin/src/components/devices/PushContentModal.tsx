@@ -160,7 +160,7 @@ export function PushContentModal({ open, onClose, device }: PushContentModalProp
               type="number"
               min={1}
               value={urutan}
-              onChange={(e) => setUrutan(Number(e.target.value))}
+              onChange={(e) => setUrutan(Math.max(1, Number(e.target.value) || 1))}
               className="form-input"
             />
           </div>
@@ -170,10 +170,10 @@ export function PushContentModal({ open, onClose, device }: PushContentModalProp
             </label>
             <input
               type="number"
-              min={5}
-              max={3600}
+              min={1}
+              max={86400}
               value={durasi}
-              onChange={(e) => setDurasi(Number(e.target.value))}
+              onChange={(e) => setDurasi(Math.max(1, Number(e.target.value) || 1))}
               className="form-input"
             />
           </div>
