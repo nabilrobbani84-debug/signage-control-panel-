@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Loader2, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Loader2, X, Copy, Check } from 'lucide-react';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { useCreateDevice, useUpdateDevice } from '@/hooks/useDevices';
@@ -22,6 +22,17 @@ export function DeviceFormModal({ open, onClose, editDevice }: DeviceFormModalPr
   const [lokasi, setLokasi] = useState(editDevice?.lokasi ?? '');
   const [errors, setErrors] = useState<{ nama?: string; lokasi?: string }>({});
   const [serverError, setServerError] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (editDevice) {
+      setNama(editDevice.nama);
+      setLokasi(editDevice.lokasi);
+    } else {
+      setNama('');
+      setLokasi('');
+    }
+  }, [editDevice]);
 
   const isPending = createDevice.isPending || updateDevice.isPending;
 
@@ -87,6 +98,39 @@ export function DeviceFormModal({ open, onClose, editDevice }: DeviceFormModalPr
       }
     >
       <form onSubmit={handleSubmit} className="space-y-4">
+        {isEdit && editDevice && (
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-300">
+              Device ID (UUID)
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={editDevice.id}
+                className="form-input flex-1 font-mono text-xs text-slate-300 bg-white/[0.03] border-white/10 select-all cursor-pointer"
+                onClick={(e) => (e.target as HTMLInputElement).select()}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(editDevice.id);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                className="btn-ghost shrink-0 px-3 py-2 text-xs flex items-center gap-1.5 border border-white/10"
+                title="Copy Device ID"
+              >
+                {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-slate-400" />}
+                <span className={copied ? 'text-emerald-400' : 'text-slate-300'}>{copied ? 'Copied' : 'Copy'}</span>
+              </button>
+            </div>
+            <p className="mt-1 text-[11px] text-slate-500">
+              Use this ID in your Signage Client Player to pair and bring it Online.
+            </p>
+          </div>
+        )}
+
         <Input
           id="device-nama"
           label="Device Name"
