@@ -5,7 +5,7 @@ import { io, Socket } from 'socket.io-client';
 import { SOCKET_EVENTS, DeviceStatusChangePayload } from '@signage/types';
 import { queryClient } from '@/lib/queryClient';
 
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:4000';
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:4000';
 
 interface SocketContextValue {
   socket: Socket | null;
