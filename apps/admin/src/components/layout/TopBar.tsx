@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Bell, User, LogOut, Check, Trash2, Info, CheckCircle2, AlertTriangle, Monitor } from 'lucide-react';
+import { Bell, User, LogOut, Check, Trash2, Info, CheckCircle2, AlertTriangle, Sun, Moon } from 'lucide-react';
 import { useSocketContext } from '@/providers/SocketProvider';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
+import { useTheme } from '@/providers/ThemeProvider';
 import { SOCKET_EVENTS } from '@signage/types';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -52,6 +53,7 @@ export function TopBar({ title, subtitle }: TopBarProps) {
   const { socket, isConnected } = useSocketContext();
   const user = useCurrentUser();
   const logout = useLogout();
+  const { theme, toggleTheme } = useTheme();
 
   const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -144,6 +146,19 @@ export function TopBar({ title, subtitle }: TopBarProps) {
           />
           {isConnected ? 'Live' : 'Offline'}
         </div>
+
+        {/* Theme Mode Toggle */}
+        <button
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-surface hover:text-foreground border border-transparent hover:border-surface-border"
+        >
+          {theme === 'dark' ? (
+            <Sun className="h-4 w-4 text-amber-400 transition-transform hover:rotate-45" />
+          ) : (
+            <Moon className="h-4 w-4 text-slate-700 transition-transform hover:-rotate-12" />
+          )}
+        </button>
 
         {/* Notifications Popover Trigger */}
         <div className="relative" ref={dropdownRef}>

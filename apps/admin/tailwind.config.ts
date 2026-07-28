@@ -14,17 +14,17 @@ const config: Config = {
         mono: ['var(--font-jetbrains)', 'monospace'],
       },
       colors: {
-        background: '#0a0a0a',
-        foreground: '#ededed',
+        background: 'var(--bg-main)',
+        foreground: 'var(--text-main)',
         surface: {
-          DEFAULT: '#111111',
-          hover: '#1a1a1a',
-          border: '#222222',
+          DEFAULT: 'var(--bg-surface)',
+          hover: 'var(--bg-surface-hover)',
+          border: 'var(--border-surface)',
         },
         accent: {
-          DEFAULT: '#ffffff',
-          hover: '#e5e5e5',
-          foreground: '#000000',
+          DEFAULT: 'var(--accent-main)',
+          hover: 'var(--accent-hover)',
+          foreground: 'var(--accent-text)',
         },
         success: {
           DEFAULT: '#10b981',

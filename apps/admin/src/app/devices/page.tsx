@@ -55,7 +55,7 @@ export default function DevicesPage() {
   const onlineCount = devices.filter((d) => d.status === DeviceStatus.ONLINE).length;
 
   return (
-    <div className="flex h-screen bg-[hsl(222,47%,6%)]">
+    <div className="flex h-screen bg-background text-foreground">
       <Sidebar />
 
       <div className="flex flex-1 flex-col overflow-hidden">

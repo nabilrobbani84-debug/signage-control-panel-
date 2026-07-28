@@ -8,6 +8,28 @@
   :root {
     --font-inter: 'Inter', system-ui, sans-serif;
     --font-jetbrains: 'JetBrains Mono', monospace;
+
+    /* Light Mode Palette */
+    --bg-main: #f8fafc;
+    --text-main: #0f172a;
+    --bg-surface: #ffffff;
+    --bg-surface-hover: #f1f5f9;
+    --border-surface: #e2e8f0;
+    --accent-main: #0f172a;
+    --accent-hover: #1e293b;
+    --accent-text: #ffffff;
+  }
+
+  .dark {
+    /* Dark Mode Palette */
+    --bg-main: #0a0a0a;
+    --text-main: #ededed;
+    --bg-surface: #111111;
+    --bg-surface-hover: #1a1a1a;
+    --border-surface: #222222;
+    --accent-main: #ffffff;
+    --accent-hover: #e5e5e5;
+    --accent-text: #000000;
   }
 
   * {
