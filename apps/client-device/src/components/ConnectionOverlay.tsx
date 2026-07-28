@@ -113,9 +113,31 @@ export function ConnectionOverlay() {
       </div>
 
       {/* Device ID */}
-      <div>
-        <span style={{ color: 'rgba(255,255,255,0.35)' }}>ID: </span>
-        <span style={{ color: '#60a5fa' }}>{deviceId.slice(0, 20)}...</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <span style={{ color: 'rgba(255,255,255,0.35)' }}>ID: </span>
+          <span style={{ color: '#60a5fa' }} title={deviceId}>{deviceId.slice(0, 16)}...</span>
+        </div>
+        <button
+          onClick={() => {
+            const newId = window.prompt('Enter Device ID from Admin Dashboard (e.g. 550e8400-e29b-41d4-a716-446655440000):', deviceId);
+            if (newId && newId.trim() !== '') {
+              useDeviceStore.getState().setDeviceId(newId.trim());
+              window.location.reload();
+            }
+          }}
+          style={{
+            background: 'rgba(255,255,255,0.1)',
+            border: 'none',
+            color: 'white',
+            cursor: 'pointer',
+            fontSize: 9,
+            padding: '2px 6px',
+            borderRadius: 4,
+          }}
+        >
+          Change
+        </button>
       </div>
 
       {/* Connection status */}
