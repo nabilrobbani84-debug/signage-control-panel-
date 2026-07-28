@@ -21,6 +21,21 @@ export async function listDevices(_req: Request, res: Response, next: NextFuncti
   }
 }
 
+export async function listDevicesPublic(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const devices = await devicesService.getAllDevices();
+    const minimal = devices.map((d) => ({
+      id: d.id,
+      nama: d.nama,
+      lokasi: d.lokasi,
+      status: d.status,
+    }));
+    res.json({ success: true, data: minimal });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function getDevice(req: Request<IdParam>, res: Response, next: NextFunction): Promise<void> {
   try {
     const device = await devicesService.getDeviceById(req.params.id);

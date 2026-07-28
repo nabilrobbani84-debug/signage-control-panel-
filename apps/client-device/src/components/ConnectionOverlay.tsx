@@ -3,6 +3,8 @@ import { useDeviceStore } from '../store/deviceStore';
 import type { ConnectionStatus } from '../store/deviceStore';
 import { format } from './dateUtils';
 
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:4000';
+
 const statusConfig: Record<ConnectionStatus, { label: string; color: string; dot: string }> = {
   connected: {
     label: 'Connected',
@@ -113,31 +115,66 @@ export function ConnectionOverlay() {
       </div>
 
       {/* Device ID */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <span style={{ color: 'rgba(255,255,255,0.35)' }}>ID: </span>
-          <span style={{ color: '#60a5fa' }} title={deviceId}>{deviceId.slice(0, 16)}...</span>
+      <div style={{ marginBottom: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+          <div>
+            <span style={{ color: 'rgba(255,255,255,0.35)' }}>ID: </span>
+            <span style={{ color: '#60a5fa' }} title={deviceId}>{deviceId.slice(0, 12)}...</span>
+          </div>
+          <button
+            onClick={async () => {
+              try {
+                const res = await fetch(`${SERVER_URL}/api/devices/public/list`);
+                const json = await res.json();
+                if (json.success && Array.isArray(json.data)) {
+                  // Filter out already online devices to avoid pairing conflicts
+                  const available = json.data;
+                  if (available.length === 0) {
+                    alert('No devices registered. Please add a device in Admin Dashboard first.');
+                    return;
+                  }
+                  
+                  const options = available.map(d => `${d.nama} (${d.status}) [ID: ${d.id}]`).join('\n');
+                  const promptMsg = `Choose a Device to pair with this screen:\n\n` + 
+                    available.map((d, i) => `${i + 1}. ${d.nama} (${d.status})`).join('\n') + 
+                    `\n\nEnter the number of the device you want to pair (or cancel):`;
+                  
+                  const choice = window.prompt(promptMsg);
+                  if (choice !== null) {
+                    const idx = parseInt(choice.trim(), 10) - 1;
+                    if (idx >= 0 && idx < available.length) {
+                      const targetDevice = available[idx];
+                      useDeviceStore.getState().setDeviceId(targetDevice.id);
+                      window.location.reload();
+                    } else {
+                      alert('Invalid selection.');
+                    }
+                  }
+                } else {
+                  throw new Error('Failed to retrieve list');
+                }
+              } catch (err) {
+                console.error(err);
+                const manualId = window.prompt('Server list unavailable. Enter Device ID manually:', deviceId);
+                if (manualId && manualId.trim() !== '') {
+                  useDeviceStore.getState().setDeviceId(manualId.trim());
+                  window.location.reload();
+                }
+              }
+            }}
+            style={{
+              background: 'rgba(255,255,255,0.1)',
+              border: 'none',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: 9,
+              padding: '2px 6px',
+              borderRadius: 4,
+            }}
+          >
+            Pair Device
+          </button>
         </div>
-        <button
-          onClick={() => {
-            const newId = window.prompt('Enter Device ID from Admin Dashboard (e.g. 550e8400-e29b-41d4-a716-446655440000):', deviceId);
-            if (newId && newId.trim() !== '') {
-              useDeviceStore.getState().setDeviceId(newId.trim());
-              window.location.reload();
-            }
-          }}
-          style={{
-            background: 'rgba(255,255,255,0.1)',
-            border: 'none',
-            color: 'white',
-            cursor: 'pointer',
-            fontSize: 9,
-            padding: '2px 6px',
-            borderRadius: 4,
-          }}
-        >
-          Change
-        </button>
       </div>
 
       {/* Connection status */}

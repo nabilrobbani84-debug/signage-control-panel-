@@ -11,6 +11,12 @@ import {
 
 const router = Router();
 
+/**
+ * GET /api/devices/public/list
+ * Public endpoint to list devices for easy client-side pairing.
+ */
+router.get('/public/list', devicesController.listDevicesPublic);
+
 // All device routes require authentication
 router.use(authenticate);
 
